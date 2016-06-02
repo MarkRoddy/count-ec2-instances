@@ -1,4 +1,5 @@
-count-ec2-instances - An AWS Lambda function to count the number of EC2 instances and publish to CloudWatch because why exactly can't I do that with CloudWatch out of the box?
+# count-ec2-instances
+An AWS Lambda function to count the number of EC2 instances and publish to CloudWatch because why exactly can't I do that with CloudWatch out of the box?
 
 
 # Deployment
