@@ -3,7 +3,7 @@
 run:
 	. .virtualenv/bin/activate && python main.py
 
-deployment-package.zip: main.py
+deployment-package.zip: main.py libs
 	zip deployment-package.zip main.py
 	mv deployment-package.zip .virtualenv//lib/python2.7/site-packages/
 	cd .virtualenv//lib/python2.7/site-packages/ && zip -r deployment-package.zip *
