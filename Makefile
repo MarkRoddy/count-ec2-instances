@@ -1,4 +1,9 @@
 
+help:
+	@echo "make run: runs the program as it would as a lambda function"
+	@echo "make deploy: create pre-reqs + deploy the lambda function"
+	@echo "make libs: install local dependencies"
+	@echo "make repl: drop into a repl with dependencies"
 
 run:
 	. .virtualenv/bin/activate && python main.py

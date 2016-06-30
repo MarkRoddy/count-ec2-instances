@@ -3,7 +3,8 @@
 import boto3
 from datetime import datetime
 
-metric_name = 'NumberRunningInstances'
+running_instances_metric_name = 'NumberRunningInstances'
+orphan_eips_metric_name = 'NumberOrphanElasticIps'
 metric_namespace = 'EC2'
 
 def lambda_handler(event, context):
@@ -12,8 +13,10 @@ def lambda_handler(event, context):
 
     timestamp = datetime.utcnow()
     num_instances = count_instances(ec2)
-    publish_num_instances(cloudwatch, num_instances, timestamp)
+    num_eips = count_orphin_eip(ec2)
+    publish_metrics(cloudwatch, timestamp, num_instances, num_eips)
     print "Observed %s instances running at %s" % (num_instances, timestamp)
+    print "Observed %s orphaned elastic ips at %s" % (num_eips, timestamp)
 
 def count_instances(ec2):
     total_instances = 0
@@ -29,16 +32,30 @@ def count_instances(ec2):
         total_instances += 1
     return total_instances
 
-def publish_num_instances(cloudwatch, num_instances, timestamp):
+# Counts the number of unattached elastic ip's
+def count_orphin_eip(ec2):
+    total_eips = 0
+    for eip in ec2.vpc_addresses.all():
+        if not eip.association:
+            total_eips += 1
+    return total_eips
+
+def publish_metrics(cloudwatch, timestamp, num_instances, num_eips):
     cloudwatch.put_metric_data(
         Namespace=metric_namespace,
         MetricData=[
             {
-                'MetricName': metric_name,
+                'MetricName': running_instances_metric_name,
                 'Timestamp': timestamp,
                 'Value': num_instances,
                 'Unit': 'Count',
-            }
+            },
+            {
+                'MetricName': orphan_eips_metric_name,
+                'Timestamp': timestamp,
+                'Value': num_eips,
+                'Unit': 'Count',
+            },
             ]
         )
 
